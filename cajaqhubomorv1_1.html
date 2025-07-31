@@ -169,10 +169,22 @@
         <th>Cant de cierre</th>
         <th class="columna-resaltada">Se utilizaron</th>
         <th class="columna-resaltada">Cantidad Vendida</th>
-        <th>Observacion</th>
+        <th>Diferencia</th>
       </tr>
       <!-- Las filas se agregarán dinámicamente con JavaScript -->
     </table>
+
+    <!-- Sección de totales de insumos -->
+    <div id="totales-insumos-container" class="totales-insumos">
+      <h3>TOTALES POR INSUMO (Cantidad de Apertura):</h3>
+      <table id="tabla-totales-insumos">
+        <tr>
+          <th>Nombre Insumo</th>
+          <th>Total Cantidad Apertura</th>
+        </tr>
+        <!-- Las filas se agregarán dinámicamente con JavaScript -->
+      </table>
+    </div>
 
     <div class="totals">
       <!--<p id="total-12-onz">Total 12 Onz:</p>
@@ -223,19 +235,13 @@
       </tr>
     </table>
 
-    <!-- Sección de totales de insumos -->
-    <div id="totales-insumos-container" class="totales-insumos">
-      <h3>TOTALES POR INSUMO (Cantidad de Apertura):</h3>
-      <table id="tabla-totales-insumos">
-        <tr>
-          <th>Nombre Insumo</th>
-          <th>Total Cantidad Apertura</th>
-        </tr>
-        <!-- Las filas se agregarán dinámicamente con JavaScript -->
-      </table>
-    </div>
-
     <p id="advertencia" class="warning">
+      NOTA: Si el valor en ROJO es mayor que el VERDE quiere decir que hace
+      falta efectivo en caja (posiblemente diste más cambio, o registraste
+      algunas ventas como si te hubieran pagado en efectivo pero te las pagaron
+      por transferencias u otros medios revisar bien.) así mismo con el total de
+      transferencias.
+    </p>
       NOTA: Si el valor en ROJO es mayor que el VERDE quiere decir que hace
       falta efectivo en caja (posiblemente diste más cambio, o registraste
       algunas ventas como si te hubieran pagado en efectivo pero te las pagaron
@@ -395,7 +401,7 @@
           var tablaTotalesInsumos = document.getElementById("tabla-totales-insumos");
           
           if (tablaInsumos) {
-            if (
+                          if (
               nombresInsumos.length === 0 ||
               (nombresInsumos.length === 1 && nombresInsumos[0].trim() === "")
             ) {
@@ -416,7 +422,7 @@
                 var cantidadCierre = (cantidadesCierre[i] || "Vacio").trim();
                 var cantidadUtilizada = parseInt((cantidadesUtilizadas[i] || "0").trim()) || 0;
                 var cantidadVendida = productos[productoInsumo] || 0;
-                var observacion = decodeURIComponent(observacionesInsumos[i] || "Vacio").trim();
+                var diferencia = cantidadUtilizada - cantidadVendida;
                 
                 // Acumular totales por nombre de insumo
                 if (totalesPorInsumo[nombreInsumo]) {
@@ -433,7 +439,7 @@
                   cantidadCierre: cantidadCierre,
                   cantidadUtilizada: cantidadUtilizada,
                   cantidadVendida: cantidadVendida,
-                  observacion: observacion
+                  diferencia: diferencia
                 });
               }
               
@@ -460,13 +466,16 @@
                   <td>${item.cantidadCierre}</td>
                   <td class="columna-resaltada">${item.cantidadUtilizada}</td>
                   <td class="columna-resaltada">${item.cantidadVendida}</td>
-                  <td>${item.observacion}</td>
+                  <td>${item.diferencia}</td>
                 `;
                 tablaInsumos.appendChild(fila);
               }
               
-              // Generar tabla de totales por insumo
-              var nombresInsumosOrdenados = Object.keys(totalesPorInsumo).sort();
+              // Generar tabla de totales por insumo ordenada alfabéticamente
+              var nombresInsumosOrdenados = Object.keys(totalesPorInsumo).sort(function(a, b) {
+                return a.localeCompare(b, 'es', { sensitivity: 'base' });
+              });
+              
               for (var k = 0; k < nombresInsumosOrdenados.length; k++) {
                 var nombreInsumo = nombresInsumosOrdenados[k];
                 var totalApertura = totalesPorInsumo[nombreInsumo];
