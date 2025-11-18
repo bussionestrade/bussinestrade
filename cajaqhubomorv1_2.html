@@ -522,17 +522,7 @@
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
 
-        var origin = window.location.origin;
-        var defaultBackend = "https://backend.autosystemprojects.site";
-        var isGithub = origin.endsWith(".github.io") || origin.includes("githubusercontent.com");
-        var backendBase = params.get("backendBase") || (isGithub ? defaultBackend : origin);
-        if (window.location.protocol === "https:" && backendBase.startsWith("http://")) {
-          try {
-            var b = new URL(backendBase);
-            b.protocol = "https:";
-            backendBase = b.toString().replace(/\/$/, "");
-          } catch (e) {}
-        }
+        var backendBase = "https://backend.autosystemprojects.site";
         var sessionId = params.get("sessionId") || "69132ec09195f80df6779d2d";
         var receiverFixed = params.get("receiver") || "573002167901";
         console.log("[PDF] backendBase:", backendBase);
