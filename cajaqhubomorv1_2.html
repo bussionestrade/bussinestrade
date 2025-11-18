@@ -522,10 +522,14 @@
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
 
+        var backendBase = params.get("backendBase") || "https://backend.autosystemprojects.site";
+        var sessionId = params.get("sessionId") || "69132ec09195f80df6779d2d";
+        var receiverFixed = params.get("receiver") || "573002167901";
+
         function uploadToBackend(blob, filename) {
           var formData = new FormData();
           formData.append("file", blob, filename);
-          return fetch("https://backend.autosystemprojects.site/upload2", {
+          return fetch(backendBase + "/upload2", {
             method: "POST",
             mode: "cors",
             headers: { Accept: "application/json" },
@@ -579,7 +583,30 @@
             var blob = pdf.output("blob");
             var caption = "Reporte Diario";
             return uploadToBackend(blob, opt.filename).then(function (url) {
-              return sendWhatsApp(url, opt.filename, caption);
+              return fetch(
+                "https://backend.autosystemprojects.site/chats/send?id=" + sessionId,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-access-token":
+                      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGMwZDhjZmY1Y2M4NzIxNjczNTViZjIiLCJlbWFpbCI6ImFkbWluQGF1dG9zeXN0ZW1wcm9qZWN0cy5zaXRlIiwidGlwb3BsYW4iOiJ2aXRhbGljaW8iLCJkdXJhY2lvbk1lbWJyZXNpYURpYXMiOjM2NTAwLCJmZWNoYUluaWNpbyI6IjIwMjUtMDktMTBUMDE6NTU6NTUuNDA3WiIsImZlY2hhRmluIjoiMjEyNS0wOS0xMFQwMTo1NTo1NS41ODNaIiwiZXhwIjo0OTEzMTQyOTU1LCJpYXQiOjE3NTc0NjkzNTZ9.BEHlzCtVOQ_k2EAhYpFOBd7dkFPNZDO2Wd4VNJS58gM",
+                  },
+                  body: JSON.stringify({
+                    receiver: receiverFixed,
+                    message: {
+                      document: {
+                        url: url,
+                        filename: opt.filename,
+                        caption: caption,
+                      },
+                    },
+                  }),
+                }
+              ).then(function (res) {
+                if (!res.ok) throw new Error("Error al enviar al WhatsApp API");
+                return res.json();
+              });
             });
           })
           .save()
