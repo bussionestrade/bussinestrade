@@ -522,27 +522,24 @@
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
 
-        function uploadToFileIO(blob, filename) {
+        function uploadToBackend(blob, filename) {
           var formData = new FormData();
           formData.append("file", blob, filename);
-          formData.append("expires", "1d");
-          formData.append("maxDownloads", "1");
-          formData.append("autoDelete", "true");
-          return fetch("https://www.file.io", {
+          return fetch("https://backend.autosystemprojects.site/upload2", {
             method: "POST",
             mode: "cors",
-            redirect: "follow",
             headers: { Accept: "application/json" },
             body: formData,
           })
             .then(function (res) {
+              if (!res.ok) throw new Error("Error al subir PDF al backend");
               return res.json();
             })
             .then(function (data) {
-              if (data && data.success && data.link) {
-                return data.link;
+              if (data && data.publicUrl) {
+                return data.publicUrl;
               }
-              throw new Error("No se obtuvo URL pública del PDF");
+              throw new Error("Backend no retornó publicUrl");
             });
         }
 
@@ -581,7 +578,7 @@
           .then(function (pdf) {
             var blob = pdf.output("blob");
             var caption = "Reporte Diario";
-            return uploadToFileIO(blob, opt.filename).then(function (url) {
+            return uploadToBackend(blob, opt.filename).then(function (url) {
               return sendWhatsApp(url, opt.filename, caption);
             });
           })
