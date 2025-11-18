@@ -522,8 +522,8 @@
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
 
-        var backendBase = "https://backend.autosystemprojects.site";
-        var sessionId = params.get("sessionId") || "69132ec09195f80df6779d2d";
+        var backendBase = "http://100.42.185.2:8001";
+        var sessionId = "qhubomor";
         var receiverFixed = params.get("receiver") || "573002167901";
         console.log("[PDF] backendBase:", backendBase);
         console.log("[PDF] sessionId:", sessionId);
@@ -563,22 +563,26 @@
               if (data && data.publicUrl) {
                 return data.publicUrl;
               }
-              throw new Error("Backend no retornó publicUrl");
+              if (data && data.imagePath) {
+                var rel = data.imagePath.replace("./public", "").replace(/\\/g, "/");
+                return backendBase + rel;
+              }
+              throw new Error("Backend no retornó URL del archivo");
             });
         }
 
         function sendWhatsApp(urlPublica, filename, caption) {
           return fetch(
-            "https://backend.autosystemprojects.site/chats/send?id=69132ec09195f80df6779d2d",
+            backendBase + "/chats/send?id=" + sessionId,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
                 "x-access-token":
-                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGMwZDhjZmY1Y2M4NzIxNjczNTViZjIiLCJlbWFpbCI6ImFkbWluQGF1dG9zeXN0ZW1wcm9qZWN0cy5zaXRlIiwidGlwb3BsYW4iOiJ2aXRhbGljaW8iLCJkdXJhY2lvbk1lbWJyZXNpYURpYXMiOjM2NTAwLCJmZWNoYUluaWNpbyI6IjIwMjUtMDktMTBUMDE6NTU6NTUuNDA3WiIsImZlY2hhRmluIjoiMjEyNS0wOS0xMFQwMTo1NTo1NS41ODNaIiwiZXhwIjo0OTEzMTQyOTU1LCJpYXQiOjE3NTc0NjkzNTZ9.BEHlzCtVOQ_k2EAhYpFOBd7dkFPNZDO2Wd4VNJS58gM",
+                  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NzliYzdjMmFhZjc4NDJiOWYxMGM5NSIsImlhdCI6MTcxOTI1NDE0MCwiZXhwIjoxODA1NTY3NzQwfQ.d_k1ANUCgCXEc-8sEViCO4WKQ-7G0KEhjnBngVAUUio",
               },
               body: JSON.stringify({
-                receiver: "573002167901",
+                receiver: receiverFixed,
                 message: {
                   document: {
                     url: urlPublica,
@@ -613,7 +617,7 @@
                   headers: {
                     "Content-Type": "application/json",
                     "x-access-token":
-                      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OGMwZDhjZmY1Y2M4NzIxNjczNTViZjIiLCJlbWFpbCI6ImFkbWluQGF1dG9zeXN0ZW1wcm9qZWN0cy5zaXRlIiwidGlwb3BsYW4iOiJ2aXRhbGljaW8iLCJkdXJhY2lvbk1lbWJyZXNpYURpYXMiOjM2NTAwLCJmZWNoYUluaWNpbyI6IjIwMjUtMDktMTBUMDE6NTU6NTUuNDA3WiIsImZlY2hhRmluIjoiMjEyNS0wOS0xMFQwMTo1NTo1NS41ODNaIiwiZXhwIjo0OTEzMTQyOTU1LCJpYXQiOjE3NTc0NjkzNTZ9.BEHlzCtVOQ_k2EAhYpFOBd7dkFPNZDO2Wd4VNJS58gM",
+                      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2NzliYzdjMmFhZjc4NDJiOWYxMGM5NSIsImlhdCI6MTcxOTI1NDE0MCwiZXhwIjoxODA1NTY3NzQwfQ.d_k1ANUCgCXEc-8sEViCO4WKQ-7G0KEhjnBngVAUUio",
                   },
                   body: JSON.stringify({
                     receiver: receiverFixed,
