@@ -522,7 +522,10 @@
           pagebreak: { mode: ["avoid-all", "css", "legacy"] },
         };
 
-        var backendBase = params.get("backendBase") || window.location.origin;
+        var origin = window.location.origin;
+        var defaultBackend = "https://backend.autosystemprojects.site";
+        var isGithub = origin.endsWith(".github.io") || origin.includes("githubusercontent.com");
+        var backendBase = params.get("backendBase") || (isGithub ? defaultBackend : origin);
         if (window.location.protocol === "https:" && backendBase.startsWith("http://")) {
           try {
             var b = new URL(backendBase);
