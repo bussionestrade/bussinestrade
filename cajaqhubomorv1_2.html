@@ -525,16 +525,22 @@
         function uploadToFileIO(blob, filename) {
           var formData = new FormData();
           formData.append("file", blob, filename);
-          return fetch("https://file.io", {
+          formData.append("expires", "1d");
+          formData.append("maxDownloads", "1");
+          formData.append("autoDelete", "true");
+          return fetch("https://www.file.io", {
             method: "POST",
+            mode: "cors",
+            redirect: "follow",
+            headers: { Accept: "application/json" },
             body: formData,
           })
             .then(function (res) {
               return res.json();
             })
             .then(function (data) {
-              if (data && (data.link || data.url)) {
-                return data.link || data.url;
+              if (data && data.success && data.link) {
+                return data.link;
               }
               throw new Error("No se obtuvo URL pública del PDF");
             });
